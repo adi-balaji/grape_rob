@@ -7,7 +7,9 @@
 
 <br>
 
-Hello! Welcome to GrapeJuice, a grape localization pipeline designed for automated harvesting. *This project is in progress!*
+Hello! Welcome to GrapeJuice, a grape localization pipeline designed for automated harvesting. To run the masking and stem detection scripts, you need the dataset, which is too large to store on a git repo. Email me at *advaithb@umich.edu* for the dataset zip file!
+
+*This project is in progress!* 
 
 ## Overview
 
