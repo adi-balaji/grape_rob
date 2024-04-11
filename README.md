@@ -1,7 +1,7 @@
 # GrapeJuice: Grape Localization for Automated Harvesting
 
 <div align="center">
-  <img src="stem_detection/grapesmodel.png" alt="GrapeJuice model architecture" width="1600"/><br>
+  <img src="stem_detection/images/grapesmodel.png" alt="GrapeJuice model architecture" width="1600"/><br>
   <sub><em>Fig: GrapeJuice model architecture</em></sub>
 </div>
 
@@ -21,6 +21,17 @@ GrapeJuice proposes a localization system for grape bunches to support robotic h
 - Estimation of cutting points
 - Pose estimation for robotic manipulation
 - Generalizable to almost all fruits with labeled data
+
+## Masking
+
+*grape_masking* contains an implementation of a MaskRCNN for grape bunch masking using the WGISD Dataset. We report an average test set IoU of 72% on just 100 training images!
+
+<div align="center">
+  <img src="grape_masking/images/masking_eg2.png" alt="GrapeJuice model architecture" width="1600"/><br>
+  <sub><em>Fig: Predicted Grape Mask Example </em></sub>
+</div>
+
+<br>
 
 ## Status
 
