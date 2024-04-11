@@ -1,7 +1,7 @@
 # GrapeJuice: Grape Localization for Automated Harvesting
 
 <div align="center">
-  <img src="grapesmodel.png" alt="GrapeJuice model architecture" width="1600"/><br>
+  <img src="stem_detection/grapesmodel.png" alt="GrapeJuice model architecture" width="1600"/><br>
   <sub><em>Fig: GrapeJuice model architecture</em></sub>
 </div>
 
