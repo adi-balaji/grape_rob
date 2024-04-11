@@ -1,3 +1,13 @@
+#Adi local git ignore
+stem_detection/grape_stem_data/
+stem_detection/grape_stem_data.tgz
+stem_detection/grapejuice_model1.pth
+
+grape_masking/data/
+grape_masking/data.tgz
+grape_masking/wgisd_v*
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
