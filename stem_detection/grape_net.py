@@ -8,6 +8,7 @@ from PIL import Image
 import numpy as np
 import os
 import json
+import base64
 import cv2
 
 def hello_grape_net():
@@ -20,8 +21,8 @@ class GrapeDataset(Dataset):
     self.img_folder = img_folder
     self.ann_folder = ann_folder
     self.transform = transforms.Compose([
-            transforms.Resize((224, 224)),
-        # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        # transforms.Resize((224, 224)),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
     self.labels = []
     self.images = []
@@ -44,8 +45,8 @@ class GrapeDataset(Dataset):
         self.labels.append(img_label)
     
     #small set for testing
-    # self.images = self.images[:20]
-    # self.labels = self.labels[:20]
+    self.images = self.images[:20]
+    self.labels = self.labels[:20]
 
     print(f'Loaded {len(self.labels)} labels from folder {self.ann_folder}')
         
@@ -64,12 +65,44 @@ class GrapeDataset(Dataset):
 
     labels = torch.tensor([0] * len(annotation))
     targets['labels'] = labels
+
+    # targets['image_id'] = idx
+
+    # targets['area'] = (bbox[:, 3] - bbox[:, 1]) * (bbox[:, 2] - bbox[:, 0])
     
 
     # if self.transform:
     #     image = self.transform(image)
         
     return image, targets
+  
+class StemMaskDataset(Dataset):
+  def __init__(self, img_folder, ann_folder):
+    self.img_folder = img_folder
+    self.ann_folder = ann_folder
+
+    self.anns = []
+    self.images = []
+
+    for file in os.listdir(img_folder):
+      img = cv2.imread(os.path.join(img_folder,file))
+      img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+      self.images.append(img)
+    print(f'Loaded {len(self.images)} images from folder {self.img_folder}')
+
+    for ann in os.listdir(ann_folder):
+      ann_file = json.load(ann)
+      self.anns.append(ann_file)
+    print(f'Loaded {len(self.anns)} anns from folder {self.ann_folder}')
+
+  def __len__(self):
+     return len(self.images)
+  
+  # def __getitem__(self, index):
+    
+       
+      
+        
 
 
 ##########################################################################################################################################################################################
