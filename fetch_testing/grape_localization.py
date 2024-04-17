@@ -22,6 +22,29 @@ grapes_model.eval()
 
 pipe = pipeline(task="depth-estimation", model="LiheYoung/depth-anything-small-hf")
 
+def plot_point_cloud(points):
+    x = points[:, 0]
+    y = points[:, 1]
+    z = points[:, 2]
+
+    mean_point = [np.mean(x), np.mean(y), np.mean(z)]
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    ax.scatter(x, y, z, c=z, cmap='Purples', alpha=0.5, s=30) # grape point cloud
+    ax.scatter(mean_point[0], mean_point[1], mean_point[2], c='red', marker='o') # bunch center
+
+
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.set_title('3D reconstruction')
+    ax.view_init(elev=45, azim=90, roll=0)
+    ax.autoscale_view()
+
+    plt.show()
+
 def point_cloud_reconstruction(depth_tensor, K_inv, sparse_point_cloud=False, sparse_points=500):
     points = []
     for y, row in enumerate(depth_tensor):
@@ -41,12 +64,12 @@ def point_cloud_reconstruction(depth_tensor, K_inv, sparse_point_cloud=False, sp
     points = np.array(points)
     
     if not sparse_point_cloud:
-        print(f'Constructed {len(points)} 3d points from mask and depth')
+        plot_point_cloud(points)
         return points
     else:
         sample_indices = np.random.choice(len(points), size=sparse_points, replace=False)
         points = points[sample_indices]
-        print(f'Constructed {len(points)} 3d points from mask and depth')
+        plot_point_cloud(points)
         return points
 
 def predict_stem_mask(stem_model, image_tensor):
@@ -64,15 +87,16 @@ def get_stem_pose(stem_mask, image_pil):
     plt.imshow(depth_map.numpy())
     plt.show()
 
-    fx = 18
-    fy = 18
-    cx = stem_mask.shape[0] / 2
+    #Camera matrix K: [527.1341414037195, 0.0, 323.8974379222906, 0.0, 525.9099904918304, 227.2282369544078, 0.0, 0.0, 1.0]
+    fx = 527.1341414037195
+    fy = 525.9099904918304
+    cx = 227.2282369544078
     cy = stem_mask.shape[1] / 2
 
-    K = np.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]])
+    K = np.array([[fx, 0.0, cx], [0.0, fy, cy], [0.0, 0.0, 1.0]])
     K_inv = np.linalg.inv(K)
 
-    point_cloud = point_cloud_reconstruction(depth_map, K_inv, sparse_point_cloud=True)
+    point_cloud = point_cloud_reconstruction(depth_map, K_inv, sparse_point_cloud=False)
 
     x = point_cloud[:, 0]
     y = point_cloud[:, 1]
@@ -95,6 +119,8 @@ plt.show()
 depth_map, stem_pose = get_stem_pose(stem_masks[0], test_image)
 
 fetch_pose = np.array([stem_pose[2], stem_pose[0], stem_pose[1]])
+
+print(f'Fetch pose: {fetch_pose}')
 
 
 
