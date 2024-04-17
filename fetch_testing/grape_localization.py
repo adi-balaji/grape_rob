@@ -61,6 +61,9 @@ def get_stem_pose(stem_mask, image_pil):
     depth_map = to_tensor(depth_out['depth'])  * stem_mask
     depth_map = depth_map.squeeze(0)
 
+    plt.imshow(depth_map.numpy())
+    plt.show()
+
     fx = 18
     fy = 18
     cx = stem_mask.shape[0] / 2
@@ -85,12 +88,14 @@ test_tensor = to_tensor(test_image).unsqueeze(0)
 
 stem_masks = predict_stem_mask(grapes_model, test_tensor)
 
+plt.imshow(test_image)
+plt.imshow(stem_masks[0].permute(1,2,0).numpy(), alpha=0.5)
+plt.show()
+
 depth_map, stem_pose = get_stem_pose(stem_masks[0], test_image)
 
-print(f'Stem pose: {stem_pose}')
+fetch_pose = np.array([stem_pose[2], stem_pose[0], stem_pose[1]])
 
-plt.imshow(depth_map)
-plt.show()
 
 
 
