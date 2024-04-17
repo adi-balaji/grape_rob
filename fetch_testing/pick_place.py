@@ -90,27 +90,38 @@ if __name__ == '__main__':
     planning_scene.removeCollisionObject("my_table")
 
     planning_scene.addCube("my_front_ground", 2, 1.1, 0.0, -1.0)
-    planning_scene.addCube("my_table", 1, 0.95, 0.0, 0.12)
+    # planning_scene.addCube("my_table", 1, 0.8, 0.0, 0.35)
+    planning_scene.addCube("my_rod", 1, 1.50, 0.0, 1.9)
 
 
 
     # This is the wrist link not the gripper itself
     gripper_frame = 'gripper_link'
     # Position and rotation of two "wave end poses"
-    home_pose = Pose(Point(0.049, 0.730, 1.0),
+    # home_pose = Pose(Point(0.049, 0.730, 1.0),
+    #                       Quaternion(-0.707, -0.0, 0.707, 0.0))
+    # prep_pose = Pose(Point(0.523, -0.108, 1.0),
+    #                       Quaternion(-0.707, -0.0, 0.707, 0.0))
+
+    #camera frame home and prep
+    home_pose = Pose(Point(0.0, 0.63, -0.5),
                           Quaternion(-0.707, -0.0, 0.707, 0.0))
-    prep_pose = Pose(Point(0.523, -0.108, 1.0),
-                          Quaternion(-0.707, -0.0, 0.707, 0.0))
+    prep_pose = Pose(Point(0.63, 0.0, -0.15),
+                          Quaternion(-0.707, -0.1, 0.0, 0.0))
+    
                         #   Quaternion(0.614, 0.409, -0.545, 0.396))
     z_rot = 0
     q_rot = quaternion_from_euler(0, 0, z_rot)
 
     # Construct a "pose_stamped" message as required by moveToPose
     gripper_pose_stamped = PoseStamped()
-    gripper_pose_stamped.header.frame_id = 'base_link'    
+    gripper_pose_stamped.header.frame_id = 'head_camera_rgb_frame'    
 
     # Main loop
-    test_latest_poses = [Pose(Point(1.1, 0.07, 1.05), Quaternion(-0.707, 0, 0, 0))]
+    #head on grip Quaternion(-0.707, 0, 0, 0))
+    #sideways from right grip Quaternion(-0.707, -0.707, 0, 0))
+    #sideways from left grip Quaternion(-0.707, 0.707, 0, 0))
+    test_latest_poses = [Pose(Point(0.8, 0.41, -0.21), Quaternion(-0.707, 0.0, 0.0, 0.0))]
     
     ctr = 0
     while not rospy.is_shutdown():
@@ -121,7 +132,7 @@ if __name__ == '__main__':
         
         # Finish building the Pose_stamped message
         # If the message stamp is not current it could be ignored
-        gripper_pose_stamped.header.stamp = rospy.Time.now()
+        # gripper_pose_stamped.header.stamp = rospy.Time.now()
         # start move
         gripper_pose_stamped.pose = home_pose
         move_group.moveToPose(gripper_pose_stamped, gripper_frame)
@@ -173,10 +184,16 @@ if __name__ == '__main__':
         gripper_open()
         # wait_for_keypress()
 
-
-        move_group.moveToPose(pre_pick_pose, gripper_frame)
+        post_pick_pose = test_pose_stamped
+        pre_pick_pose.pose.position.x = pre_pick_pose.pose.position.z - .45
+        move_group.moveToPose(pre_pick_pose, gripper_frame,0.05)
         result = move_group.get_move_action().get_result()
-        print("at prepick")
+        print("at postpick")
+
+
+        # move_group.moveToPose(pre_pick_pose, gripper_frame)
+        # result = move_group.get_move_action().get_result()
+        # print("at prepick")
         # wait_for_keypress()
 
         gripper_pose_stamped.pose = home_pose

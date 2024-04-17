@@ -106,7 +106,7 @@ def get_stem_pose(stem_mask, image_pil):
 
     return depth_map, mean_point
 
-test_img_file = 'lab_test.jpg'
+test_img_file = '/Users/adibalaji/Desktop/grape_juice/fetch_cam/rgb_image.jpg'
 test_image = Image.open(test_img_file)
 test_tensor = to_tensor(test_image).unsqueeze(0)
 
