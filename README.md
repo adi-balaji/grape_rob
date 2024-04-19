@@ -1,8 +1,8 @@
 # GrapeJuice: Grape Localization for Automated Harvesting
 
 <div align="center">
-  <img src="stem_detection/images/grapesmodel.png" alt="GrapeJuice model architecture" width="1600"/><br>
-  <sub><em>Fig: GrapeJuice model architecture</em></sub>
+  <img src="stem_detection/images/grape_harvest.gif" alt="Robotic harvesting on fetch" width="1200"/><br>
+  <sub><em>Fig: Robotic Grape Harvesting on Fetch</em></sub>
 </div>
 
 <br>
@@ -13,7 +13,14 @@ Hello! Welcome to GrapeJuice, a grape localization pipeline designed for automat
 
 ## Overview
 
-GrapeJuice proposes a localization system for grape bunches to support robotic harvesting. The main objective is to localize cutting points and estimate the pose of grape bunches to provide waypoints to a robotic manipulator.
+<div align="center">
+  <img src="stem_detection/images/grapesmodel.png" alt="GrapeJuice model architecture" width="1000"/><br>
+  <sub><em>Fig: GrapeJuice model architecture</em></sub>
+</div>
+
+<br>
+
+GrapeJuice proposes a localization system for grape bunches to support robotic harvesting. The main objective is to localize cutting points and estimate the pose of grape bunches to provide waypoints to a robotic manipulator. 
 
 ## Features
 
