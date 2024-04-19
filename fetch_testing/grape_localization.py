@@ -17,7 +17,7 @@ grapes_model.roi_heads.box_predictor = faster_rcnn.FastRCNNPredictor(in_features
 in_features_mask = grapes_model.roi_heads.mask_predictor.conv5_mask.in_channels
 hidden_layer = 256
 grapes_model.roi_heads.mask_predictor = mask_rcnn.MaskRCNNPredictor(in_features_mask, hidden_layer, num_classes)
-grapes_model.load_state_dict(torch.load('/Users/adibalaji/Desktop/grape_juice/stem_detection/stem_mask1.4.pth'))
+grapes_model.load_state_dict(torch.load('/Users/adibalaji/Desktop/grape_juice/grape_masking/wgisd_v1.5.pth'))
 grapes_model.eval()
 
 pipe = pipeline(task="depth-estimation", model="LiheYoung/depth-anything-small-hf")
@@ -47,6 +47,11 @@ def plot_point_cloud(points):
 
 def point_cloud_reconstruction(depth_tensor, K_inv, sparse_point_cloud=False, sparse_points=500):
     points = []
+    # depth_png_path = '/Users/adibalaji/Desktop/grape_juice/fetch_cam/depth_image.png'
+    # depth_image = Image.open(depth_png_path)
+    # depth_image = depth_image.convert('L')
+    # depth_fetch = torch.from_numpy(np.array(depth_image))
+
     for y, row in enumerate(depth_tensor):
         for x, val in enumerate(row):
             if val != 0:
@@ -54,9 +59,8 @@ def point_cloud_reconstruction(depth_tensor, K_inv, sparse_point_cloud=False, sp
                 point_pixel = np.array([x, y, 1])
                 point_camera = np.matmul(K_inv, point_pixel)
                 depth_value = depth_tensor[y, x]
-                if depth_value < 0.2 or depth_value > 0.95:
+                if depth_value < 0.2:
                     continue
-
                 
                 point_camera[2] = depth_value
                 points.append(point_camera)
@@ -64,12 +68,12 @@ def point_cloud_reconstruction(depth_tensor, K_inv, sparse_point_cloud=False, sp
     points = np.array(points)
     
     if not sparse_point_cloud:
-        plot_point_cloud(points)
+        # plot_point_cloud(points)
         return points
     else:
         sample_indices = np.random.choice(len(points), size=sparse_points, replace=False)
         points = points[sample_indices]
-        plot_point_cloud(points)
+        # plot_point_cloud(points)
         return points
 
 def predict_stem_mask(stem_model, image_tensor):
@@ -80,11 +84,20 @@ def predict_stem_mask(stem_model, image_tensor):
     return masks
 
 def get_stem_pose(stem_mask, image_pil):
-    depth_out = pipe(image_pil)
-    depth_map = to_tensor(depth_out['depth'])  * stem_mask
-    depth_map = depth_map.squeeze(0)
+    # depth_out = pipe(image_pil)
 
-    plt.imshow(depth_map.numpy())
+    # plt.imshow(depth_out['depth'])
+    # plt.show()
+
+    # depth_map = to_tensor(depth_out['depth'])  * stem_mask
+    # depth_map = depth_map.squeeze(0)
+
+    depth_png_path = '/Users/adibalaji/Desktop/grape_juice/fetch_cam/depth_image.png'
+    depth_image = Image.open(depth_png_path)
+    depth_image = depth_image.convert('L')
+    depth_fetch = torch.from_numpy(np.array(depth_image))
+
+    plt.imshow(depth_fetch.numpy())
     plt.show()
 
     #Camera matrix K: [527.1341414037195, 0.0, 323.8974379222906, 0.0, 525.9099904918304, 227.2282369544078, 0.0, 0.0, 1.0]
@@ -96,7 +109,7 @@ def get_stem_pose(stem_mask, image_pil):
     K = np.array([[fx, 0.0, cx], [0.0, fy, cy], [0.0, 0.0, 1.0]])
     K_inv = np.linalg.inv(K)
 
-    point_cloud = point_cloud_reconstruction(depth_map, K_inv, sparse_point_cloud=False)
+    point_cloud = point_cloud_reconstruction(depth_fetch, K_inv, sparse_point_cloud=False)
 
     x = point_cloud[:, 0]
     y = point_cloud[:, 1]
@@ -104,7 +117,7 @@ def get_stem_pose(stem_mask, image_pil):
 
     mean_point = [np.mean(x), np.mean(y), np.mean(z)]
 
-    return depth_map, mean_point
+    return depth_fetch, mean_point
 
 test_img_file = '/Users/adibalaji/Desktop/grape_juice/fetch_cam/rgb_image.jpg'
 test_image = Image.open(test_img_file)
@@ -113,14 +126,33 @@ test_tensor = to_tensor(test_image).unsqueeze(0)
 stem_masks = predict_stem_mask(grapes_model, test_tensor)
 
 plt.imshow(test_image)
-plt.imshow(stem_masks[0].permute(1,2,0).numpy(), alpha=0.5)
+plt.imshow(stem_masks[0].permute(1,2,0).numpy(), alpha=0.8)
 plt.show()
 
 depth_map, stem_pose = get_stem_pose(stem_masks[0], test_image)
 
-fetch_pose = np.array([stem_pose[2], stem_pose[0], stem_pose[1]])
+cam2base_x = -0.15
+depth_extra_offset = 0.05
+cam2base_y = -0.085
+cam2base_z = 1.2
+fetch_pose = np.array([stem_pose[2] + cam2base_x + depth_extra_offset, (stem_pose[0] + cam2base_y), stem_pose[1] + cam2base_z])
 
 print(f'Fetch pose: {fetch_pose}')
+
+# depth_png_path = '/Users/adibalaji/Desktop/grape_juice/fetch_cam/depth_image.png'
+
+# depth_image = Image.open(depth_png_path)
+# depth_image = depth_image.convert('L')
+# depth_tensor = torch.from_numpy(np.array(depth_image))
+
+# plt.imshow(depth_tensor.numpy())
+# plt.show()
+
+#CHANGES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#using fetch depth map
+#reflect y coordinate
+#removed point plotting
+
 
 
 

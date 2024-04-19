@@ -6,6 +6,7 @@ stem_detection/soccer_test_data/
 stem_detection/grape_stem_mask_data/
 /stem_detection/stem_mask1.4.pth
 /stem_detection/lab_grapes
+/stem_detection/lab_grape_img
 
 grape_masking/data/
 grape_masking/data.tgz
