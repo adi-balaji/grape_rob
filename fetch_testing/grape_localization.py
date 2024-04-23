@@ -131,11 +131,17 @@ plt.show()
 
 depth_map, stem_pose = get_stem_pose(stem_masks[0], test_image)
 
-cam2base_x = -0.15
+cam2base_x = -0.3
 depth_extra_offset = 0.05
-cam2base_y = -0.085
+cam2base_y = -0.11
 cam2base_z = 1.2
-fetch_pose = np.array([stem_pose[2] + cam2base_x + depth_extra_offset, (stem_pose[0] + cam2base_y), stem_pose[1] + cam2base_z])
+height_extra_offset = 0.04
+
+
+x_offset = - .4
+y_offset = -.1
+z_offset = 0
+fetch_pose = np.array([stem_pose[2] + x_offset, stem_pose[0] + y_offset, stem_pose[1] + z_offset])
 
 print(f'Fetch pose: {fetch_pose}')
 

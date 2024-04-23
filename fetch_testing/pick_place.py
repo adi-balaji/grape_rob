@@ -8,6 +8,7 @@ from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion
 import actionlib
 import control_msgs.msg
 from tf.transformations import *
+import tf
 
 # Note: fetch_moveit_config move_group.launch must be running
 # Safety!: Do NOT run this script near people or objects.
@@ -120,10 +121,13 @@ if __name__ == '__main__':
     #head on grip Quaternion(-0.707, 0, 0, 0))
     #sideways from right grip Quaternion(-0.707, -0.707, 0, 0))
     #sideways from left grip Quaternion(-0.707, 0.707, 0, 0))
-    test_latest_poses = [Pose(Point(0.9, 0.069, 1.19), Quaternion(-0.707, 0.0, 0.0, 0.0))]
-    
+    test_latest_poses = [Pose(Point(0.6, 0.05, -0.01), Quaternion(-0.707, 0.0, 0.0, 0.0))]
+    listener = tf.TransformListener()
+    listener.waitForTransform('head_camera_rgb_frame', 'base_link', rospy.Time(), rospy.Duration(1.0))
+
+
     ctr = 0
-    while not rospy.is_shutdown():
+    while not rospy.is_shutdown() and ctr == 0:
         # wait_for_keypress()
         # Maybe do some more work here or exit
 
@@ -148,15 +152,20 @@ if __name__ == '__main__':
         wait_for_keypress()
 
 
-        gripper_pose_stamped.pose = prep_pose
-        move_group.moveToPose(gripper_pose_stamped, gripper_frame)
-        result = move_group.get_move_action().get_result()
-        print("at prep")
+        # gripper_pose_stamped.pose = prep_pose
+        # move_group.moveToPose(gripper_pose_stamped, gripper_frame)
+        # result = move_group.get_move_action().get_result()
+        # print("at prep")
         
         test_pose_stamped = PoseStamped()
-        test_pose_stamped.header.frame_id = 'base_link'
-        test_pose_stamped.header.stamp = rospy.Time.now()
+        test_pose_stamped.header.frame_id = 'head_camera_rgb_frame'
+        # test_pose_stamped.header.stamp = rospy.Time.now()
         test_pose_stamped.pose = test_latest_poses[ctr]
+
+        test_pose_stamped = listener.transformPose('base_link', test_pose_stamped)
+        print("Transformed Grape Pose:", test_pose_stamped)
+        wait_for_keypress()
+
         pre_pick_pose = test_pose_stamped
         pre_pick_pose.pose.position.x = pre_pick_pose.pose.position.x - .11
         pre_pick_pose.pose.position.z = pre_pick_pose.pose.position.z + .02
@@ -175,10 +184,9 @@ if __name__ == '__main__':
 
         gripper_close()
         print("close gripper")
-        wait_for_keypress()
         rospy.sleep(1)
-        # gripper_open()
-        # wait_for_keypress()
+        gripper_open()
+        wait_for_keypress()
 
         post_pick_pose = pick_pose
         post_pick_pose.pose.position.x = pre_pick_pose.pose.position.x - .06
