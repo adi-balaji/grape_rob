@@ -7,7 +7,7 @@ from torchvision.models.detection import faster_rcnn
 from torchvision.models.detection import mask_rcnn
 from PIL import Image
 import matplotlib.pyplot as plt
-from transformers import pipeline
+# from transformers import pipeline
 import numpy as np
 
 grapes_model = maskrcnn_resnet50_fpn(weights=MaskRCNN_ResNet50_FPN_Weights.DEFAULT)
@@ -17,10 +17,10 @@ grapes_model.roi_heads.box_predictor = faster_rcnn.FastRCNNPredictor(in_features
 in_features_mask = grapes_model.roi_heads.mask_predictor.conv5_mask.in_channels
 hidden_layer = 256
 grapes_model.roi_heads.mask_predictor = mask_rcnn.MaskRCNNPredictor(in_features_mask, hidden_layer, num_classes)
-grapes_model.load_state_dict(torch.load('/Users/adibalaji/Desktop/grape_juice/grape_masking/wgisd_v1.5.pth'))
+grapes_model.load_state_dict(torch.load('/Users/isaac/Documents/Classes/rob498/grape_juice/grape_masking/wgisd_v1.5.pth'))
 grapes_model.eval()
 
-pipe = pipeline(task="depth-estimation", model="LiheYoung/depth-anything-small-hf")
+# pipe = pipeline(task="depth-estimation", model="LiheYoung/depth-anything-small-hf")
 
 def plot_point_cloud(points):
     x = points[:, 0]
@@ -92,7 +92,7 @@ def get_stem_pose(stem_mask, image_pil):
     # depth_map = to_tensor(depth_out['depth'])  * stem_mask
     # depth_map = depth_map.squeeze(0)
 
-    depth_png_path = '/Users/adibalaji/Desktop/grape_juice/fetch_cam/depth_image.png'
+    depth_png_path = '/Users/isaac/Documents/Classes/rob498/grape_juice/fetch_cam/depth_image.png'
     depth_image = Image.open(depth_png_path)
     depth_image = depth_image.convert('L')
     depth_fetch = torch.from_numpy(np.array(depth_image))
@@ -119,7 +119,7 @@ def get_stem_pose(stem_mask, image_pil):
 
     return depth_fetch, mean_point
 
-test_img_file = '/Users/adibalaji/Desktop/grape_juice/fetch_cam/rgb_image.jpg'
+test_img_file = '/Users/isaac/Documents/Classes/rob498/grape_juice/fetch_cam/rgb_image.jpg'
 test_image = Image.open(test_img_file)
 test_tensor = to_tensor(test_image).unsqueeze(0)
 
@@ -138,9 +138,9 @@ cam2base_z = 1.2
 height_extra_offset = 0.04
 
 
-x_offset = - .4
-y_offset = -.1
-z_offset = 0
+x_offset = - .35
+y_offset = -.185
+z_offset = 0.04
 fetch_pose = np.array([stem_pose[2] + x_offset, stem_pose[0] + y_offset, stem_pose[1] + z_offset])
 
 print(f'Fetch pose: {fetch_pose}')

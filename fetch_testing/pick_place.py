@@ -99,7 +99,7 @@ if __name__ == '__main__':
     # This is the wrist link not the gripper itself
     gripper_frame = 'gripper_link'
     # Position and rotation of two "wave end poses"
-    home_pose = Pose(Point(0.05, 0.650, 0.7),
+    home_pose = Pose(Point(0.2, 0.7, 0.55),
                           Quaternion(-0.707, -0.0, 0.707, 0.0))
     prep_pose = Pose(Point(0.5, 0.5, 0.8),
                           Quaternion(-0.707, -0.0, 0.707, 0.0))
@@ -121,11 +121,11 @@ if __name__ == '__main__':
     #head on grip Quaternion(-0.707, 0, 0, 0))
     #sideways from right grip Quaternion(-0.707, -0.707, 0, 0))
     #sideways from left grip Quaternion(-0.707, 0.707, 0, 0))
-    test_latest_poses = [Pose(Point(0.6, 0.05, -0.01), Quaternion(-0.707, 0.0, 0.0, 0.0))]
+    test_latest_poses = [Pose(Point(0.7291529,  -0.02869766, 0.0311619), Quaternion(-0.707, 0, 0, 0))]
     listener = tf.TransformListener()
     listener.waitForTransform('head_camera_rgb_frame', 'base_link', rospy.Time(), rospy.Duration(1.0))
 
-
+# wolverine
     ctr = 0
     while not rospy.is_shutdown() and ctr == 0:
         # wait_for_keypress()
@@ -167,15 +167,15 @@ if __name__ == '__main__':
         wait_for_keypress()
 
         pre_pick_pose = test_pose_stamped
-        pre_pick_pose.pose.position.x = pre_pick_pose.pose.position.x - .11
-        pre_pick_pose.pose.position.z = pre_pick_pose.pose.position.z + .02
+        pre_pick_pose.pose.position.x = pre_pick_pose.pose.position.x - .1
+        pre_pick_pose.pose.position.z = pre_pick_pose.pose.position.z
         move_group.moveToPose(pre_pick_pose, gripper_frame,0.05)
         result = move_group.get_move_action().get_result()
         print("at prepick")
         wait_for_keypress()
 
         pick_pose = test_pose_stamped
-        pick_pose.pose.position.x = pre_pick_pose.pose.position.x + .05
+        pick_pose.pose.position.x = pre_pick_pose.pose.position.x + 0.1
         move_group.moveToPose(pick_pose, gripper_frame)
         result = move_group.get_move_action().get_result()
         print("at pick")
@@ -184,13 +184,12 @@ if __name__ == '__main__':
 
         gripper_close()
         print("close gripper")
-        rospy.sleep(1)
+        rospy.sleep(0.5)
         gripper_open()
         wait_for_keypress()
 
         post_pick_pose = pick_pose
-        post_pick_pose.pose.position.x = pre_pick_pose.pose.position.x - .06
-        post_pick_pose.pose.position.z = pre_pick_pose.pose.position.z + .02
+        post_pick_pose.pose.position.x = pick_pose.pose.position.x - 0.1
         move_group.moveToPose(post_pick_pose, gripper_frame,0.05)
         result = move_group.get_move_action().get_result()
         print("at postpick")
